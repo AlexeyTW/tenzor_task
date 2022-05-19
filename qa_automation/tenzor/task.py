@@ -1,15 +1,15 @@
 import time
-
 import pytest
 from pages import Page
 from locators.locators import YandexPageLocators, YandexImagesLocators
-from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
 url = 'https://yandex.ru/'
 
 class TestTenzorTask:
 
-	#@pytest.mark.skip
+	@pytest.mark.skip
 	def test1(self, browser):
 		page = Page(browser, url)
 		page.open(url)
@@ -50,11 +50,13 @@ class TestTenzorTask:
 		assert page.is_element_present(YandexImagesLocators.IMAGE_1), 'Первая картинка не открыта'
 
 		page.click(YandexImagesLocators.BUTTON_NEXT)
-		time.sleep(3)
+		time.sleep(1)
+		WebDriverWait(browser, 5).until(lambda browser: im1_url != browser.current_url)
 		im2_url = page.get_image_url()
-		assert im1_url != im2_url, 'Картинка не сменилась'
+		assert im2_url != im1_url, 'Картинка не сменилась'
 
 		page.click(YandexImagesLocators.BUTTON_PREV)
-		time.sleep(3)
+		time.sleep(1)
+		WebDriverWait(browser, 5).until(lambda browser: im2_url != browser.current_url)
 		im3_url = page.get_image_url()
 		assert im3_url == im1_url, f'Ссылки на картинки 1 и 3 должны совпадать: {im1_url} \n {im2_url}'
