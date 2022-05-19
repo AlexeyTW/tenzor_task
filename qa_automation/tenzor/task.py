@@ -1,9 +1,15 @@
+import time
+
+import pytest
 from pages import Page
 from locators.locators import YandexPageLocators, YandexImagesLocators
+from selenium.webdriver.common.keys import Keys
 
 url = 'https://yandex.ru/'
 
 class TestTenzorTask:
+
+	#@pytest.mark.skip
 	def test1(self, browser):
 		page = Page(browser, url)
 		page.open(url)
@@ -13,9 +19,11 @@ class TestTenzorTask:
 		page.type_text(YandexPageLocators.SEARCH_FIELD, 'Тензор')
 		assert page.is_element_present(YandexPageLocators.SEARCH_SUGGESTIONS), 'Предложения поиска не найдены'
 
-		page.check_search_list()
+		page.check_search_list()  # Проверяем, есть ли слово "тензор" в подсказках поиска
 		page.press_enter(YandexPageLocators.SEARCH_FIELD)
 		page.wait_for_element_present(YandexPageLocators.SEARCH_RESULT)
+		assert page.is_element_present(YandexPageLocators.SEARCH_RESULT), 'Результатов поиска нет'
+
 		href = page.check_search_result()
 		assert href.__contains__('tensor.ru'), f'Неправильная ссылка на сайт Тензор в результатах поиска ({href})'
 
@@ -29,9 +37,24 @@ class TestTenzorTask:
 		assert page.check_current_url().__contains__('yandex.ru/images/'), 'Переход на картинки не осуществлен. ' \
 																			'Ссылка должна содержать текст ' \
 																			'"yandex.ru/images"'
+
 		page.click(YandexImagesLocators.POPULAR_FIRST)
 		assert page.is_element_present(YandexImagesLocators.SEARCH_FIELD)
 
 		popular_text = browser.find_element(*YandexImagesLocators.POPULAR_FIRST).text
 		search_text = page.get_search_text()
 		assert popular_text == search_text
+
+		page.click(YandexImagesLocators.IMAGE_1)
+		im1_url = page.get_image_url()
+		assert page.is_element_present(YandexImagesLocators.IMAGE_1), 'Первая картинка не открыта'
+
+		page.click(YandexImagesLocators.BUTTON_NEXT)
+		time.sleep(3)
+		im2_url = page.get_image_url()
+		assert im1_url != im2_url, 'Картинка не сменилась'
+
+		page.click(YandexImagesLocators.BUTTON_PREV)
+		time.sleep(3)
+		im3_url = page.get_image_url()
+		assert im3_url == im1_url, f'Ссылки на картинки 1 и 3 должны совпадать: {im1_url} \n {im2_url}'

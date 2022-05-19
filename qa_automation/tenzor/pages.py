@@ -20,6 +20,7 @@ class Page:
 	def click(self, obj):
 		if self.is_element_present(obj):
 			self.browser.find_element(*obj).click()
+			self.wait_for_element_present(obj)
 			return
 		raise exceptions.NoSuchElementException
 
@@ -77,3 +78,8 @@ class Page:
 		url = unquote(self.browser.current_url)
 		text = re.search(r'text=([^&]+)', url).group()
 		return text.split('=')[1]
+
+	def get_image_url(self):
+		url = unquote(self.browser.current_url)
+		image_url = re.search(r'img_url=([^&]+)', url).group()
+		return image_url.split('=')[1]
