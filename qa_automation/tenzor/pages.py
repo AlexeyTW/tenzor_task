@@ -72,7 +72,7 @@ class Page:
 				self.browser.switch_to.window(windows[i + 1])
 
 	def check_current_url(self):
-		return self.browser.current_url
+		return unquote(self.browser.current_url)
 
 	def get_search_text(self):
 		url = unquote(self.browser.current_url)
@@ -81,5 +81,6 @@ class Page:
 
 	def get_image_url(self):
 		url = unquote(self.browser.current_url)
+		print(url)
 		image_url = re.search(r'img_url=([^&]+)', url).group()
 		return image_url.split('=')[1]
