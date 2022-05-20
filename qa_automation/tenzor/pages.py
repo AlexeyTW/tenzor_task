@@ -47,7 +47,7 @@ class Page:
 			html = self.browser.page_source
 			soup = BeautifulSoup(html, 'lxml')
 			res = soup.select('li.mini-suggest__item')
-			if len(res) >= 1:
+			if len(res) >= 5:
 				break
 		for i in range(len(res)):
 			if res[i].text == 'тензор':
@@ -61,7 +61,7 @@ class Page:
 		html = self.browser.page_source
 		soup = BeautifulSoup(html, 'lxml')
 		res = soup.find('ul', {'id': 'search-result', 'role': 'main'})
-		item = res.find_all('a')[0]
+		item = res.find_all('a')[0]  # Первый результат поиска
 		href: str = item.get('href')
 		return href
 
@@ -81,6 +81,8 @@ class Page:
 
 	def get_image_url(self):
 		url = unquote(self.browser.current_url)
-		print(url)
 		image_url = re.search(r'img_url=([^&]+)', url).group()
 		return image_url.split('=')[1]
+
+	def wait_for_url_changes(self, url):
+		WebDriverWait(self.browser, 10).until(EC.url_changes(url))

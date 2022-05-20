@@ -43,19 +43,21 @@ class TestTenzorTask:
 
 		popular_text = browser.find_element(*YandexImagesLocators.POPULAR_FIRST).text
 		search_text = page.get_search_text()
-		assert popular_text == search_text
+		assert popular_text == search_text, f'Название категории "{popular_text}" ' \
+											f'не совпадает с текстом в поле поиска "{search_text}"'
 
 		page.click(YandexImagesLocators.IMAGE_1)
-		time.sleep(1)
 		im1_url = page.get_image_url()
 		assert page.is_element_present(YandexImagesLocators.IMAGE_1), 'Первая картинка не открыта'
 
+		browser_url = browser.current_url
 		page.click(YandexImagesLocators.BUTTON_NEXT)
-		time.sleep(1)
+		page.wait_for_url_changes(browser_url)
 		im2_url = page.get_image_url()
 		assert im2_url != im1_url, 'Картинка не сменилась'
 
+		browser_url = browser.current_url
 		page.click(YandexImagesLocators.BUTTON_PREV)
-		time.sleep(1)
+		page.wait_for_url_changes(browser_url)
 		im3_url = page.get_image_url()
-		assert im3_url == im1_url, f'Ссылки на картинки 1 и 3 должны совпадать: {im1_url} \n {im2_url}'
+		assert im3_url == im1_url, f'Ссылки на картинки должны совпадать: {im1_url}; {im2_url}'
